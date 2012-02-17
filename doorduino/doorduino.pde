@@ -1,19 +1,29 @@
+#include <SPI.h>
+
+#include <Dhcp.h>
+#include <Dns.h>
+#include <Ethernet.h>
+#include <EthernetClient.h>
+#include <EthernetServer.h>
+#include <EthernetUdp.h>
+#include <util.h>
+
 /*
 doorduino.pde
 Fubar-Doorduino Project
 by Phil Gillhaus 6/11/10
+updated to Arudino 1.0 by Bill French 2/16/2012
 This sketch, when used in combination with the ethernet
 shield and the switch based lock and door sensors at 
 the FUBAR Labs hackerspace will serve a page declaring
 whether the space is open or closed.
 */
 
-#include <Ethernet.h>
 
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 byte ip[] = { 192, 168, 1, 3 };
 
-Server server(80);
+EthernetServer server(80);
 
 int doorPin=8;
 int lockPin=7;
@@ -36,7 +46,7 @@ void setup()
 
 void loop()
 {
-  Client client = server.available();
+  EthernetClient client = server.available();
   servPage(client);
   lock=digitalRead(lockPin);
   if (lock!=lockState && (millis() - lockTimer) > lockBounce)
@@ -68,7 +78,7 @@ void loop()
   }
 }
 
-void servPage(Client client) {
+void servPage(EthernetClient client) {
    if (client) {
     // an http request ends with a blank line
     boolean current_line_is_blank = true;
